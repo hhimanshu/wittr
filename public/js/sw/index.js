@@ -8,13 +8,26 @@ self.addEventListener('install', function(event) {
     'https://fonts.gstatic.com/s/roboto/v15/d-6IYplOFocCacKzxwXSOD8E0i7KZn-EPnyo3HZu7kw.woff'
   ];
 
-  event.waitUntil(
-    // TODO: open a cache named 'wittr-static-v1'
-    // Add cache the urls from urlsToCache
-  );
+    event.waitUntil(
+        // TODO: open a cache named 'wittr-static-v1'
+        // Add cache the urls from urlsToCache
+        caches.open('wittr-static-v1').then(cache => {
+            return cache.addAll(urlsToCache);
+        })
+    );
 });
 
 self.addEventListener('fetch', function(event) {
   // Leave this blank for now.
   // We'll get to this in the next task.
+    event.respondWith(
+        caches.open('wittr-static-v1').then(cache => {
+            return cache.match(event.request).then(response => {
+                if (!response) {
+                    return fetch(event.request);
+                }
+                return response;
+            });
+        })
+    );
 });
